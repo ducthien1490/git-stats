@@ -18,11 +18,6 @@ require "./git_stats/stats/file/filetype"
 
 require "./git_stats/statgen"
 
-require "./git_stats/renderer"
-require "./git_stats/renderer/haml"
-require "./git_stats/renderer/sass"
-require "./git_stats/renderer/gnuplot"
-
 $options = {
   out: "stats",
   verbose: false,
@@ -34,7 +29,6 @@ parser = OptionParser.new do |opts|
   opts.banner = "Usage git_stats.rb [option] <gitdir> <start date(yyyy/mm/dd)> <end data()>"
 
   opts.on("-v", "--[no-]verbose", "verbose mode") do |arg|
-    binding.pry
     $options[:verbose] = arg
   end
 end
