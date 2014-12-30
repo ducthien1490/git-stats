@@ -15,6 +15,7 @@ require "./git_stats/stats/commit/author"
 require "./git_stats/stats/commit/time"
 require "./git_stats/stats/file"
 require "./git_stats/stats/file/filetype"
+require "./git_stats/stats/file/file_catefory"
 
 require "./git_stats/statgen"
 
@@ -23,7 +24,7 @@ $options = {
   path: "../",
   branch: nil,
   start_date: nil,
-  end_date: nil,
+  end_date: Date.today.to_s,
   file_type: false
 }
 
@@ -57,7 +58,7 @@ end
 
 parser.parse!
 stats = StatGen.new
-stats.start_date ||= Date.parse($options[:start_date])
-stats.end_date ||= Date.parse($options[:start_date])
+stats.start_date = Date.parse($options[:start_date]) unless $options[:start_date].nil?
+stats.end_date = Date.parse($options[:end_date])
 stats << [$options[:respos], $options[:path], "HEAD"]
 stats.calc($options[:branch])

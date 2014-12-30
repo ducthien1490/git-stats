@@ -21,6 +21,7 @@ class StatGen
   attr_reader :hour_stats
   attr_reader :wday_stats
   attr_reader :lastweeks_stats
+  attr_reader :file_category_stats
 
   attr_reader :file_stats
   attr_reader :filetype_stats
@@ -47,6 +48,11 @@ class StatGen
     @hour_stats = HourCommitStats.new
     @wday_stats = DayOfWeekCommitStats.new
     @lastweeks_stats = LastWeeksCommitStats.new
+    @file_category_stats = [".rb", ".js", ".yml", "others"].map do |type|
+      file_cat = FileCategory.new
+      file_cat.type = type
+      file_cat
+    end
 
     @file_stats = FileStats.new
     @filetype_stats = FileTypeFileStats.new
@@ -109,6 +115,9 @@ class StatGen
         @hour_stats.update(commit)
         @wday_stats.update(commit)
         @lastweeks_stats.update(commit)
+        @file_category_stats.each do |file_cat|
+          file_cat.update(commit)
+        end
 
         @repostate[repo.name][:last] = commit[:hash]
       end

@@ -94,6 +94,12 @@ class Git
         commit[:files_deleted] = 0
         commit[:lines_added] = 0
         commit[:lines_deleted] = 0
+        commit[:file_stats] = {
+          ".rb" => {add: 0, remove: 0},
+          ".js" => {add: 0, remove: 0},
+          ".yml" => {add: 0, remove: 0},
+          "others" => {add: 0, remove: 0}
+        }
       elsif line == ''
         write_cache(commit) unless @cachefile.nil?
         block.call(commit)
@@ -108,6 +114,15 @@ class Git
         match = /^(\d+)\s+(\d+)/.match(line)
         unless match.nil?
           added, deleted = match.captures
+          file = line.split("\t").last
+          if commit[:file_stats].keys.include?(File.extname(file))
+            file_type = File.extname(file)
+            commit[:file_stats][file_type][:add] += added.to_i
+            commit[:file_stats][file_type][:remove] += deleted.to_i
+          else
+            commit[:file_stats]["others"][:add] += added.to_i
+            commit[:file_stats]["others"][:remove] += deleted.to_i
+          end
           commit[:lines_added] += added.to_i
           commit[:lines_deleted] += deleted.to_i
         end
