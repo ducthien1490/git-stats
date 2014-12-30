@@ -58,6 +58,6 @@ end
 parser.parse!
 stats = StatGen.new
 stats.start_date ||= Date.parse($options[:start_date])
-stats.end_date ||= Date.pare($options[:start_date])
+stats.end_date ||= Date.parse($options[:start_date])
 stats << [$options[:respos], $options[:path], "HEAD"]
 stats.calc($options[:branch])

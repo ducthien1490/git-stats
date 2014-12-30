@@ -94,8 +94,8 @@ class StatGen
       repo.get_commits(@repostate[repo.name][:last], branch_name) do |commit|
         next if !@future && (commit[:time] > Time.now)
         next if (@maxage > 0) && ((Time.now - commit[:time]) > @maxage)
-        next if @start_date.present? && commit[:time] < @start_date
-        next if @end_date.present? && commit[:time] > @end_date
+        next if @start_date && (commit[:time].to_date < @start_date)
+        next if @end_date && (commit[:time].to_date > @end_date)
 
         puts "    commit #{@num_commits} ..." if @verbose && ((@num_commits % 100) == 0)
 
