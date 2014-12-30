@@ -46,7 +46,7 @@ class Git
     f.close
   end
 
-  def get_commits(last = nil, &block)
+  def get_commits(last = nil, branch, &block)
     if last.nil?
       range = @ref
       unless @cachefile.nil?
@@ -66,7 +66,7 @@ class Git
     open_cache unless @cachefile.nil?
 
     commit = nil
-    sh("git log --reverse --summary --numstat --pretty=format:\"HEADER: %at %ai %H %T %aN <%aE>\" #{range}") do |line|
+    sh("git log #{branch} --reverse --summary --numstat --pretty=format:\"HEADER: %at %ai %H %T %aN <%aE>\" #{range}") do |line|
       if line =~ /^HEADER:/
         unless commit.nil?
           write_cache(commit) unless @cachefile.nil?

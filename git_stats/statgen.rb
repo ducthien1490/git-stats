@@ -6,6 +6,8 @@ class StatGen
   attr_accessor :maxage
   attr_accessor :commitcache
   attr_accessor :include_mail
+  attr_accessor :start_date
+  attr_accessor :end_date
   attr_reader :repos
 
   attr_reader :num_commits
@@ -77,7 +79,7 @@ class StatGen
     add(value[0], value[1], value[2])
   end
 
-  def calc
+  def calc(branch_name)
     # reset because of caching for now
     @file_stats = FileStats.new
     @filetype_stats = FileTypeFileStats.new
@@ -89,9 +91,11 @@ class StatGen
 
       puts "  repository '#{repo.name}' ..." unless @quiet
 
-      repo.get_commits(@repostate[repo.name][:last]) do |commit|
+      repo.get_commits(@repostate[repo.name][:last], branch_name) do |commit|
         next if !@future && (commit[:time] > Time.now)
         next if (@maxage > 0) && ((Time.now - commit[:time]) > @maxage)
+        next if @start_date.present? && commit[:time] < @start_date
+        next if @end_date.present? && commit[:time] > @end_date
 
         puts "    commit #{@num_commits} ..." if @verbose && ((@num_commits % 100) == 0)
 
