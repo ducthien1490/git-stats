@@ -6,6 +6,7 @@ require "date"
 require "rubygems"
 require "pry-rails"
 require "gnuplot"
+require "gruff"
 require "./git_stats/author"
 require "./git_stats/yearmonth"
 require "./git_stats/git"
@@ -63,11 +64,12 @@ stats.start_date = Date.parse($options[:start_date]) unless $options[:start_date
 stats.end_date = Date.parse($options[:end_date])
 stats << [$options[:respos], $options[:path], "HEAD"]
 stats.calc($options[:branch])
-#stats_by_date = stats.date_stats.map{|k, _| "'#{k.to_s}'" }
-stats_by_date = (0..stats.date_stats.count).select{|i| i}
+stats_by_date = stats.date_stats.map{|k, _| "'#{k.to_s}'" }
 stats_lines_added = stats.date_stats.map{|_, v| v.lines_added}
 stats_lines_deleted = stats.date_stats.map{|_, v| v.lines_deleted}
-graph_data = [{x_val: stats_by_date, y_val: stats_lines_added},
-              {x_val: stats_by_date, y_val: stats_lines_deleted}]
-graph = Plot.new(graph_data, $options[:respos], "Lines added/deleted", "Time", "Number")
-graph.plot
+g = Gruff::Line.new
+g.title = "Lines Added/Removed"
+g.labels = Hash[(0..stats_by_date.size).zip stats_by_date]
+g.data :Added, stats_lines_added
+g.data :Removed, stats_lines_deleted
+g.write("code_line_stats.png")
