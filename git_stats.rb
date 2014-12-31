@@ -5,6 +5,7 @@ require "fileutils"
 require "date"
 require "rubygems"
 require "pry-rails"
+require "gnuplot"
 require "./git_stats/author"
 require "./git_stats/yearmonth"
 require "./git_stats/git"
@@ -16,8 +17,8 @@ require "./git_stats/stats/commit/time"
 require "./git_stats/stats/file"
 require "./git_stats/stats/file/filetype"
 require "./git_stats/stats/file/file_catefory"
-
 require "./git_stats/statgen"
+require "./git_stats/plot"
 
 $options = {
   respos: "../",
@@ -29,7 +30,7 @@ $options = {
 }
 
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage git_stats.rb -r [resposibility] -p [path] -b [branch] -f [from_YYYYMMDD] -t [to_YYYYMMDD] -c [classify based on file type]"
+  opts.banner = "Usage git_stats.rb -r [resposibility] -p [path] -b [branch] -f [from_YYYY-MM-DD] -t [to_YYYY-MM-DD] -c [classify based on file type]"
 
   opts.on("-r", "--respos=arg", "resposibility name") do |arg|
     $options[:respos] = arg
@@ -62,3 +63,11 @@ stats.start_date = Date.parse($options[:start_date]) unless $options[:start_date
 stats.end_date = Date.parse($options[:end_date])
 stats << [$options[:respos], $options[:path], "HEAD"]
 stats.calc($options[:branch])
+#stats_by_date = stats.date_stats.map{|k, _| "'#{k.to_s}'" }
+stats_by_date = (0..stats.date_stats.count).select{|i| i}
+stats_lines_added = stats.date_stats.map{|_, v| v.lines_added}
+stats_lines_deleted = stats.date_stats.map{|_, v| v.lines_deleted}
+graph_data = [{x_val: stats_by_date, y_val: stats_lines_added},
+              {x_val: stats_by_date, y_val: stats_lines_deleted}]
+graph = Plot.new(graph_data, $options[:respos], "Lines added/deleted", "Time", "Number")
+graph.plot
