@@ -19,7 +19,8 @@ require "./git_stats/stats/file"
 require "./git_stats/stats/file/filetype"
 require "./git_stats/stats/file/file_catefory"
 require "./git_stats/statgen"
-require "./git_stats/plot"
+require "./git_stats/line_plot_by_date"
+require "./git_stats/bar_chart"
 
 $options = {
   respos: "../",
@@ -64,12 +65,14 @@ stats.start_date = Date.parse($options[:start_date]) unless $options[:start_date
 stats.end_date = Date.parse($options[:end_date])
 stats << [$options[:respos], $options[:path], "HEAD"]
 stats.calc($options[:branch])
-stats_by_date = stats.date_stats.map{|k, _| "'#{k.to_s}'" }
-stats_lines_added = stats.date_stats.map{|_, v| v.lines_added}
-stats_lines_deleted = stats.date_stats.map{|_, v| v.lines_deleted}
-g = Gruff::Line.new
-g.title = "Lines Added/Removed"
-g.labels = Hash[(0..stats_by_date.size).zip stats_by_date]
-g.data :Added, stats_lines_added
-g.data :Removed, stats_lines_deleted
-g.write("code_line_stats.png")
+date_stats = stats.date_stats.map{|k, _| k.to_s}
+stats_lines_added = {name: "Added",
+  value: stats.date_stats.map{|_, v| v.lines_added}}
+stats_lines_deleted ={name: "Deleted",
+  value: stats.date_stats.map{|_, v| v.lines_deleted}}
+line_graph_data = [stats_lines_added, stats_lines_deleted]
+line_graph = LinePlotByDate.new("Lines Added/Deleted", date_stats, line_graph_data, "line_stats_by_date" )
+line_graph.export_file
+file_types = stats.file_category_stats.collect{|f| f.type}
+file_stats_bar_chart = BarChart.new("File type stats", file_types, stats.file_category_stats, "file_type_stats")
+file_stats_bar_chart.export_file
