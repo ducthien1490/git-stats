@@ -27,7 +27,7 @@ class LinePlotByDate
       if label == labels.first || label == labels.last
         label
       else
-        ""
+        " "
       end
     end
     Hash[(0..labels.size).zip formated_labels]
