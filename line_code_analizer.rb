@@ -5,6 +5,7 @@ require "fileutils"
 require "date"
 require "rubygems"
 require "gruff"
+require "pry-rails"
 require "./git_stats/author"
 require "./git_stats/yearmonth"
 require "./git_stats/git"
@@ -30,7 +31,7 @@ $options = {
 }
 
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage git_stats.rb -r [resposibility] -p [path] -b [branch] -f [from_YYYY-MM-DD] -t [to_YYYY-MM-DD] -c [classify based on file type]"
+  opts.banner = "Usage line_code_analizer.rb -r [resposibility] -p [path] -b [branch] -f [from_YYYY-MM-DD] -t [to_YYYY-MM-DD] -c [classify based on file type]"
 
   opts.on("-r", "--respos=arg", "resposibility name") do |arg|
     $options[:respos] = arg
@@ -63,14 +64,5 @@ stats.start_date = Date.parse($options[:start_date]) unless $options[:start_date
 stats.end_date = Date.parse($options[:end_date])
 stats << [$options[:respos], $options[:path], "HEAD"]
 stats.calc($options[:branch])
-date_stats = stats.date_stats.map{|k, _| k.to_s}
-stats_lines_added = {name: "Added",
-  value: stats.date_stats.map{|_, v| v.lines_added}}
-stats_lines_deleted ={name: "Deleted",
-  value: stats.date_stats.map{|_, v| v.lines_deleted}}
-line_graph_data = [stats_lines_added, stats_lines_deleted]
-line_graph = LinePlotByDate.new("Lines Added/Deleted", date_stats, line_graph_data, "line_stats_by_date" )
+line_graph = LinePlotByDate.new("Lines Added/Deleted", stats.date_stats, "line_stats_by_date" )
 line_graph.export_file
-file_types = stats.file_category_stats.collect{|f| f.type}
-file_stats_bar_chart = BarChart.new("File type stats", file_types, stats.file_category_stats, "file_type_stats")
-file_stats_bar_chart.export_file

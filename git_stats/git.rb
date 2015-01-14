@@ -98,6 +98,7 @@ class Git
           ".rb" => {add: 0, remove: 0},
           ".js" => {add: 0, remove: 0},
           ".yml" => {add: 0, remove: 0},
+          ".spec" => {add: 0, remove: 0},
           "others" => {add: 0, remove: 0}
         }
       elsif line == ''

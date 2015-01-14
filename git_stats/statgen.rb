@@ -48,7 +48,7 @@ class StatGen
     @hour_stats = HourCommitStats.new
     @wday_stats = DayOfWeekCommitStats.new
     @lastweeks_stats = LastWeeksCommitStats.new
-    @file_category_stats = [".rb", ".js", ".yml", "others"].map do |type|
+    @file_category_stats = [".rb", ".js", ".yml", ".spec", "others"].map do |type|
       file_cat = FileCategory.new
       file_cat.type = type
       file_cat
