@@ -9,8 +9,8 @@ class LinePlotByDate
     @outfile = outfile
   end
 
-  def export_file
-    formulate_data(@data_sets).each do |key, value|
+  def export_file(file_types)
+    formulate_data(@data_sets, file_types).each do |key, value|
       g = Gruff::Line.new
       g.title = "#{@title} #{key.to_s} file"
       g.labels = formulate_labels @data_sets
@@ -34,7 +34,7 @@ class LinePlotByDate
     Hash[(0..labels.size).zip formated_labels]
   end
 
-  def formulate_data period_stats
+  def formulate_data(period_stats, file_types)
     period_data = {
       ".rb" => {add: [], remove: []},
       ".js" => {add: [], remove: []},
@@ -50,6 +50,10 @@ class LinePlotByDate
           period_data[file_key][key] << val
         end
       end
+    end
+    if file_types.length > 0
+      types = file_types.split(",").map{|type| type.insert(0, ".")}
+      period_data.keys.each{|type| period_data.delete(type) unless types.include?(type)}
     end
     period_data
   end
