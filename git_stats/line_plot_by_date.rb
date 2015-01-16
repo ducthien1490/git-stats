@@ -10,13 +10,15 @@ class LinePlotByDate
   end
 
   def export_file
-    g = Gruff::Line.new
-    g.title = @title
-    g.labels = formulate_labels @data_sets
     formulate_data(@data_sets).each do |key, value|
-      g.data key.to_sym, value
+      g = Gruff::Line.new
+      g.title = "#{@title} #{key.to_s} file"
+      g.labels = formulate_labels @data_sets
+      value.each do |type, val|
+        g.data type, val
+      end
+      g.write("#{@outfile} #{key.gsub(".", "")} file.png")
     end
-    g.write("#{@outfile}.png")
   end
 
   private
@@ -34,23 +36,18 @@ class LinePlotByDate
 
   def formulate_data period_stats
     period_data = {
-      "add .rb" => [],
-      "remove .rb" => [],
-      "add .js" => [],
-      "remove .js" => [],
-      "add .yml" => [],
-      "remove .yml" => [],
-      "add .spec" => [],
-      "remove .spec" => []
+      ".rb" => {add: [], remove: []},
+      ".js" => {add: [], remove: []},
+      ".yml" => {add: [], remove: []},
+      ".spec" => {add: [], remove: []},
     }
     period_stats.each_value do |date_stats|
       file_stats = date_stats.file_type_stats
       file_stats.each do |file_key, file_value|
         next if file_key == "others"
-        file_value.each do |type, value|
-          name = "#{type.to_s} #{file_key}"
-          value = (type == :remove) ? -value : value
-          period_data[name].push(value)
+        file_value.each do |key, val|
+          val = -val if key == :remove
+          period_data[file_key][key] << val
         end
       end
     end
