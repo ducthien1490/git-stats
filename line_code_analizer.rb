@@ -31,7 +31,7 @@ $options = {
 }
 
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: line_code_analizer.rb -r [resposibility] -p [path] -b [branch] -f [from: YYYY/MM/DD] -t [to: YYYY/MM/DD] -c [file type: rb,js,yml,spec]"
+  opts.banner = "Usage: ruby line_code_analizer.rb -r [resposibility] -p [path] -b [branch] -f [from: YYYY/MM/DD] -t [to: YYYY/MM/DD] -c [file type: rb,js,yml,spec]"
 
   opts.on("-r", "--respos=arg", "resposibility name") do |arg|
     $options[:respos] = arg
